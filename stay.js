@@ -3,8 +3,9 @@ let audio,volume,drone,last=-1;
 const shots=[
   ['二楼走廊　03:17:00','门外站着夜班服务生。','他的右手垂在膝盖下面。铜钥匙在手指间轻轻地转。'],
   ['二楼走廊　03:17:01','他一直站在原地。','走廊却少了一扇门。又少了一扇。'],
-  ['207 客房　03:17:02','画面切到了你的床头。','枕头凹了下去。有什么东西正把脸贴过来。'],
-  ['207 客房　03:17:03','「您的叫醒服务。」','铜钥匙落在你耳边。他还在等你睁眼。']
+  ['猫眼　03:17:02','你刚贴近玻璃，它就眨了一下。','那只眼睛里倒映着你的房门。从里面看。'],
+  ['207 客房　03:17:03','画面切到了你的床头。','枕头凹了下去。有什么东西正把脸贴过来。'],
+  ['207 客房　03:17:04','「您的叫醒服务。」','铜钥匙落在你耳边。他还在等你睁眼。']
 ];
 const disturbances=[
   {section:document.querySelector('.lakewatch')},
@@ -19,7 +20,10 @@ function knock(){
   gain.gain.setValueAtTime(.07,now);gain.gain.exponentialRampToValueAtTime(.0001,now+.24);
   osc.connect(gain);gain.connect(audio.destination);osc.onended=()=>{osc.disconnect();gain.disconnect()};osc.start();osc.stop(now+.25);
 }
+const lake=document.querySelector('.lakewatch');
 function update(){
+  const lakeProgress=clamp((innerHeight-lake.getBoundingClientRect().top)/(innerHeight+lake.offsetHeight));
+  lake.style.setProperty('--window-zoom',1+lakeProgress*.45);
   for(const item of disturbances){
     const shifted=item.section.getBoundingClientRect().top<innerHeight*.18;
     if(shifted!==item.shifted){
@@ -30,9 +34,11 @@ function update(){
   const progress=clamp(-hall.getBoundingClientRect().top/Math.max(1,hall.offsetHeight-innerHeight));
   scene.style.setProperty('--zoom',1+Math.min(progress,.6)*2.4);
   scene.style.setProperty('--light',.78-.58*clamp((progress-.45)/.15));
-  scene.style.setProperty('--bed',clamp((progress-.59)/.07));
+  scene.style.setProperty('--eye',progress>=.38&&progress<.68?1:0);
+  scene.style.setProperty('--eye-zoom',1+.68*clamp((progress-.38)/.30));
+  scene.style.setProperty('--bed',progress>=.68?1:0);
   scene.style.setProperty('--lean',1+.40*clamp((progress-.68)/.32));
-  const stage=progress>=.81?3:progress>=.59?2:progress>=.26?1:0;
+  const stage=progress>=.85?4:progress>=.68?3:progress>=.38?2:progress>=.19?1:0;
   if(stage!==last){
     if(last>=0&&stage>last)knock();
     scene.dataset.shot=stage;
