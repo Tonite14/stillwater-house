@@ -21,7 +21,34 @@ function knock(){
   osc.connect(gain);gain.connect(audio.destination);osc.onended=()=>{osc.disconnect();gain.disconnect()};osc.start();osc.stop(now+.25);
 }
 const lake=document.querySelector('.lakewatch');
+
+const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+const cover=document.querySelector('.hero');
+const clock=document.querySelector('.stay-clock');
+const clockTime=clock.querySelector('time');
+const stops=[...document.querySelectorAll('.chapter,.night,.end')].map(section=>({
+ section,time:section.querySelector('.stamp')?.textContent.trim().slice(0,5)||(section===hall?'03:17':'03:16')
+}));
+const observer=new IntersectionObserver(entries=>{
+  for(const {target,isIntersecting} of entries){
+    if(isIntersecting){target.classList.add('played');observer.unobserve(target)}
+  }
+},{threshold:.23});
+document.querySelectorAll('.journal,.room,.night').forEach(section=>observer.observe(section));
+function moveCoverAndClock(){
+  let time='18:40';
+  for(const stop of stops){if(stop.section.getBoundingClientRect().top>innerHeight*.5)break;time=stop.time}
+  if(clockTime.textContent!==time)clockTime.textContent=time;
+  clock.style.setProperty('--read',clamp(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)));
+  if(!motionPreference.matches && scrollY<cover.offsetHeight+innerHeight){
+    const offset=Math.min(scrollY,cover.offsetHeight);
+    cover.style.setProperty('--landscape',offset*.09+'px');
+    cover.style.setProperty('--headline',offset*.17+'px');
+  }
+}
+
 function update(){
+  moveCoverAndClock();
   const lakeProgress=clamp((innerHeight-lake.getBoundingClientRect().top)/(innerHeight+lake.offsetHeight));
   lake.style.setProperty('--window-zoom',1+lakeProgress*.45);
   for(const item of disturbances){
@@ -38,6 +65,7 @@ function update(){
   scene.style.setProperty('--eye-zoom',1+.68*clamp((progress-.38)/.30));
   scene.style.setProperty('--bed',progress>=.68?1:0);
   scene.style.setProperty('--lean',1+.40*clamp((progress-.68)/.32));
+  scene.style.setProperty('--matte',(Math.sin(Math.PI*clamp(progress/.68))*9).toFixed(2)+'%');
   const stage=progress>=.85?4:progress>=.68?3:progress>=.38?2:progress>=.19?1:0;
   if(stage!==last){
     if(last>=0&&stage>last)knock();
@@ -51,4 +79,11 @@ sound.onclick=async()=>{
   if(!audio){audio=new AudioContext();volume=audio.createGain();volume.gain.value=0;volume.connect(audio.destination);drone=audio.createOscillator();drone.type='triangle';drone.frequency.value=74;drone.connect(volume);drone.start();}
   await audio.resume();const on=sound.getAttribute('aria-pressed')!=='true';sound.setAttribute('aria-pressed',String(on));sound.lastChild.textContent=on?'　环境音开':'　环境音关';volume.gain.setTargetAtTime(on?.056:0,audio.currentTime,.35);update();
 };
-addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
+let frame=0;
+function scheduleUpdate(){
+  if(frame)return;
+  frame=requestAnimationFrame(()=>{frame=0;update()});
+}
+addEventListener('scroll',scheduleUpdate,{passive:true});
+addEventListener('resize',scheduleUpdate);
+update();
