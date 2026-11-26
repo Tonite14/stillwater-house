@@ -26,7 +26,7 @@ const map=$('.map'),ride=$('.ride'),cross=$('.crossing'),finale=$('.finale');
 const journey=$('.journey');
 const stage=$('.journey-stage');
 const scenes=[...stage.children];
-const durations=[2.5,4.0,4.2,3.1,3.8,6.7,4.7,3.8,4.8,7.4];
+const durations=[2.5,4.0,4.2,4.3,3.8,6.7,4.7,3.8,4.8,9.6];
 const dissolve=.62;
 let timelineEnd=0;
 const timings=scenes.map((scene,i)=>{
@@ -73,6 +73,11 @@ const arrival=$('.arrival'),landing=$('.landing'),landingView=$('.landing-view')
 const hallDescriptions={lake:'脚下的地毯被一层静水淹没，倒影里有人站在门前。',pine:'绿门上方垂下一枝杉树，影子落在墙上，地毯上散着细针。',ridge:'尽头的绿门敞开着，里面仍是这条红地毯走廊。'};
 const guestroom=$('.guestroom');
 const roomView=$('.room-take');
+const windowPassenger=$('.window-passenger');
+const visitorAlt={
+ lake:'雨湿的窗台外悬着一个穿旧裙子的女人，她正探身望向床沿。',
+ ridge:'门框上方盘踞着一只异物，折起的肢节抓住木框，一只浑浊的小眼睛朝下看。'
+};
 const closeup=$('.impact-shot img');
 const lastShots={
  lake:['impact-lake.png','玻璃碎在身后，水面冲到眼前，那张脸已经在房间里面。'],
@@ -200,6 +205,10 @@ function paint(){
  write($('#shore-marker'),sh<.49?'WEST PYLON　/　西坡支架':'NORTH FACE　/　北坡');
  write($('#shore-label'),sh<.28?'右窗 · 湖岸':sh<.53?'西坡支架':sh<.79?'右窗 · 背山侧':'北坡　／　右窗');
  const pause=progress(listening);
+ const reflection=smooth(.38,.57,pause)*(1-smooth(.80,.97,pause));
+ listening.classList.toggle('glass-ready',sh>.15 || pause>0);
+ listening.style.setProperty('--reflection',reflection.toFixed(3));
+ windowPassenger.setAttribute('aria-hidden',String(reflection<.5));
  listening.style.setProperty('--omen',smooth(.23,.84,pause));
  listening.style.setProperty('--slip',((smooth(.26,.87,pause)-.5)*21)+'%');
  listening.style.setProperty('--waterline',(90-65*smooth(.23,.9,pause))+'%');
@@ -257,6 +266,9 @@ function paint(){
  updateFrontDesk(m,r,pause,s,walk,hall,room);
  const key=document.body.dataset.print;
  if(hall>0 || room>0)prepareCloseup(key);
+ const encounter=visitorAlt[key] ? smooth(.57,.67,room) : 0;
+ guestroom.classList.toggle('visitor-ready',hall>.12 || room>0);
+ guestroom.style.setProperty('--visitor',encounter.toFixed(3));
  const dip=smooth(.27,.41,room)*(1-smooth(.45,.63,room));
  const strike=room>=.82 && loadedShot===key;
  const shutter=.87*smooth(.735,.815,room)*(1-smooth(.82,.86,room));
@@ -276,7 +288,7 @@ function paint(){
  guestroom.classList.toggle('arrived',room>.95);
  $('#back').tabIndex=room>.95?0:-1;
  write($('#night-line'),room<.51?'湖景客房 · 二层':(acted?visit.ending:'房卡已取　／　'+printName));
- const roomAlt=strike?lastShots[key][1]:occupied>.6?path.alt:'从门口望见床头的铜灯与湖景窗';
+ const roomAlt=strike?lastShots[key][1]:encounter>.5?visitorAlt[key]:occupied>.6?path.alt:'从门口望见床头的铜灯与湖景窗';
  if(roomView.getAttribute('aria-label')!==roomAlt)roomView.setAttribute('aria-label',roomAlt);
  if(on && lastRoom<.53 && room>=.53 && room-lastRoom<.1)tap();
  lastRoom=room;

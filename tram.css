@@ -218,3 +218,16 @@ body[data-run=morning]{--side-image:url(west-morning.png)}body[data-run=afternoo
 .letter-slip b{font:46px Georgia}.letter-slip span{border-top:1px dashed;padding-top:8px}
 @media(max-width:680px){.entry-copy{left:5vw;bottom:6svh}.entry-copy h2{font-size:27px}.letter-slip{left:35%!important;top:22%!important}.entry-shortcut{margin-right:0}}
 @media(prefers-reduced-motion:reduce){.check-in .entry-plate{animation:none;transform:none}.entry-screen .bell-wave{display:none!important}}
+
+.window-passenger,.room-visitor {
+ position:absolute;
+ inset:0;
+ pointer-events:none;
+ background-position:center;
+ background-size:cover;
+}
+.window-passenger {opacity:var(--reflection,0)}
+.listening.glass-ready .window-passenger {background-image:url(cabin-reflection.png)}
+.room-visitor {opacity:var(--visitor,0)}
+[data-print=lake] .visitor-ready .room-visitor {background-image:url(window-woman.png)}
+[data-print=ridge] .visitor-ready .room-visitor {background-image:url(lintel-creature.png)}
