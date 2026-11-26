@@ -86,3 +86,23 @@ body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(14
 [data-print=ridge] .room-take {transform:scale(var(--approach,1)) rotate(var(--cant,0deg));transform-origin:41% 39%}
 @media(max-width:800px){[data-print=lake] .room-take>div{background-position:58% center}[data-print=ridge] .room-take>div{background-position:40% center}}
 @media(prefers-reduced-motion:reduce){.pass-omen,[data-print=ridge] .room-take{transform:none}body[data-print] .nightprint{clip-path:none}}
+
+.arrival-guide{display:grid;grid-template-columns:minmax(240px,.85fr) 1fr;gap:6vw;align-items:center;margin:2vh 8vw 7vh;padding:4vh 0;border-block:1px solid #abb09b}
+.arrival-guide img{display:block;width:100%;height:clamp(175px,23vw,340px);object-fit:cover}
+.arrival-guide h2{font-size:clamp(30px,3.5vw,64px);margin:.25em 0}.arrival-guide p{max-width:28em}
+.arrival,.landing{height:370svh;background:#0d110e;color:#f2eddf}
+.arrival-screen,.landing-screen{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate}
+.shore-lodge,.porch-close,.landing-view,.landing-view>div,.hall-shade{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat}
+.shore-lodge{background-image:url(lodge.jpg);background-position:70% center;transform-origin:68% 48%;transform:scale(var(--shore-step,1.06));filter:brightness(.74) saturate(.79)}
+.porch-close{background-image:url(porch.png);background-position:51% center;transform-origin:52% 51%;transform:scale(var(--porch-step,1));filter:brightness(var(--porch-light,.88));opacity:var(--at-door,0)}
+.running .arrival .label{opacity:var(--arrival-ink,1);background:none;border:0;padding:0;text-shadow:0 1px 8px black}
+.arrival .label p,.hall-credit p{font:clamp(18px,2.1vw,34px)/1.6 "Songti SC",SimSun,serif;letter-spacing:.1em}
+.landing-view{transform:scale(var(--pace,1));transform-origin:50% 51%}.landing-view>div{background-position:center}
+.hall-lit{background-image:url(landing-day.png);filter:brightness(var(--daylight,.69)) saturate(.76)}
+.hall-late{opacity:var(--lamps,0);background-image:url(landing-water.png)}
+[data-print=pine] .hall-late{background-image:url(landing-needles.png)}
+[data-print=ridge] .hall-late{background-image:url(landing-fold.png)}
+.hall-shade{background:radial-gradient(ellipse at 50% 51%,transparent 22%,#020509c4);opacity:var(--shadow,.25)}
+.hall-credit{position:absolute;left:7vw;bottom:9svh;opacity:var(--hall-ink,0);text-shadow:0 1px 8px black}
+@media(max-width:680px){.arrival-guide{grid-template-columns:1fr;gap:18px}.arrival-guide img{height:auto}.shore-lodge{background-position:74% center}}
+@media(prefers-reduced-motion:reduce){.shore-lodge,.porch-close,.landing-view{transform:none}.journey.running{height:1750svh}}
