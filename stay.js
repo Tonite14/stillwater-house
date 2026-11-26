@@ -47,6 +47,7 @@ function followWalks(){
     const progress=clamp(-rect.top/Math.max(1,rect.height-innerHeight));
     const beat=Math.min(2,Math.floor(progress*3));
     walk.style.setProperty('--dolly',String(1+progress*(i?1.2:.36)));
+    if(i)walk.style.setProperty('--threshold',1+progress*3.4);
     walk.style.setProperty('--exposure',String(i?.53-progress*.2:1-progress*.12));
     walk.style.setProperty('--color',String(i?.45:1-progress*.15));
     if(walk.dataset.beat!==String(beat)){
@@ -56,8 +57,34 @@ function followWalks(){
     }
   }
 }
-const stops=[...document.querySelectorAll('.chapter,.night,.end,.landing-walk')].map(section=>({
- section,time:section.querySelector('.stamp')?.textContent.trim().slice(0,5)||(section.matches('.arrival-walk')?'18:45':section.matches('.return-walk')?'03:14':section===hall?'03:17':'03:16')
+const wakeButtons=[...document.querySelectorAll('.wake-options button')];
+const wakeSlip=document.querySelector('.wake-slip');
+const carbon=document.querySelector('.carbon-story');
+const carbonHeading=carbon.querySelector('h2'),carbonText=carbon.querySelector('p');
+let wakeTime='',paperBeat=-1;
+wakeButtons.forEach(button=>button.onclick=()=>{
+  wakeTime=button.textContent;
+  for(const option of wakeButtons)option.setAttribute('aria-pressed',String(option===button));
+  wakeSlip.querySelector('output').textContent='住客联　／　207　／　'+wakeTime+'　已登记';
+  wakeSlip.classList.add('marked');
+  shots[4][1]='「您约的是 '+wakeTime+'。」';
+  shots[4][2]='床头钟仍是 03:17。他把你的存根压在枕边：「我知道。我先来看看您睡着没有。」';
+  paperBeat=-1;
+});
+function developCopy(){
+  const box=carbon.getBoundingClientRect();
+  if(box.bottom<0||box.top>innerHeight)return;
+  const p=clamp(-box.top/Math.max(1,box.height-innerHeight));
+  carbon.style.setProperty('--ink',clamp(p*2.2));
+  carbon.style.setProperty('--close',1+p*.22);
+  const beat=p>.66?2:p>.28?1:0;
+  if(beat===paperBeat)return;
+  paperBeat=beat;
+  carbonHeading.textContent=['纸是从门缝下塞进来的。',wakeTime?'是你的叫醒单。':'有人替你填了叫醒单。','签收栏已经盖了章。'][beat];
+  carbonText.textContent=['你认得那枚绿色圆印。纸角上沾着一抹蓝墨。',wakeTime?'207 房，'+wakeTime+'。连笔尖划破纸的地方，都和你的存根对得上。':'住客联还空着。前台底联上却有房号、时间和你的签名。','「03:17，住客已应门。」你望向床头钟。现在是 02:58。'][beat];
+}
+const stops=[...document.querySelectorAll('.chapter,.night,.end,.landing-walk,.carbon-story')].map(section=>({
+ section,time:section.querySelector('.stamp')?.textContent.trim().slice(0,5)||(section===carbon?'02:58':section.matches('.arrival-walk')?'18:45':section.matches('.return-walk')?'03:14':section===hall?'03:17':'03:16')
 }));
 const observer=new IntersectionObserver(entries=>{
   for(const {target,isIntersecting} of entries){
@@ -80,6 +107,7 @@ function moveCoverAndClock(){
 function update(){
   moveCoverAndClock();
   followWalks();
+  developCopy();
   const lakeProgress=clamp((innerHeight-lake.getBoundingClientRect().top)/(innerHeight+lake.offsetHeight));
   lake.style.setProperty('--window-zoom',1+lakeProgress*.45);
   for(const item of disturbances){
