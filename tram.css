@@ -75,7 +75,10 @@ body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(14
 /* In the woods a shadow hangs from the roof, then lowers over the bed. */
 [data-print=pine] .pass-omen {background:url(roofglass.png) 65% 18% / cover;mask-image:linear-gradient(#000a,#000c 18%,transparent 65%);transform:translateY(var(--slip,0));filter:brightness(.58) saturate(.45)}
 [data-print=pine] .station-omen,[data-print=pine] .outside,[data-print=pine] .near,[data-print=pine] .threshold {display:none}
-[data-print=pine] .nightprint {clip-path:inset(0 0 var(--canopy,100%) 0)}
+@media (prefers-reduced-motion:no-preference) {
+  [data-print=pine] .room-take {transform:scale(min(var(--approach,1),1.10));transform-origin:46% 92%}
+}
+[data-print=pine] .nightprint {background-position:46% bottom;clip-path:inset(0 0 var(--canopy,100%) 0)}
 /* A second section of the station slowly shears away and repeats inward. */
 [data-print=ridge] .pass-omen {background:url(skylight.png) center/cover;clip-path:polygon(46% 0,100% 0,100% 100%,56% 100%,51% 60%,54% 52%);transform:translateX(var(--slip,0)) scale(1.16);filter:brightness(.43) sepia(.3)}
 [data-print=ridge] .near,[data-print=ridge] .outside,[data-print=ridge] .threshold,[data-print=ridge] .night-hatch,[data-print=ridge] .roof {display:none}
