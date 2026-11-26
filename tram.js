@@ -2,17 +2,30 @@ const $=s=>document.querySelector(s);
 const cards=[...document.querySelectorAll('.times button')];
 const turn=$('#turn'),postback=$('#postback');
 turn.onclick=()=>{postback.hidden=!postback.hidden;turn.setAttribute('aria-expanded',String(!postback.hidden));turn.textContent=postback.hidden?'翻到明信片背面':'收起背面题字'};
-const forecasts=['晨雾贴着水面。坐右边，能看见码头。','午后的光落在西坡。经过支架时，留意湖面的影子。','末班车会经过亮灯的旅馆。日落后，请把车窗留一条缝。'];
+const services=[
+ {id:'morning',name:'晨班',eta:'09:22',alt:'晨雾中的湖岸、栈桥和白船',forecast:'晨雾贴着水面。最先露出来的是码头，随后才看得见白船。',stages:['西坡 · 入雾','右窗 · 雾散','西坡 · 再次入雾']},
+ {id:'afternoon',name:'午班',eta:'14:52',alt:'午后草坡上的缆车投影与钢架支柱',forecast:'午后的日光斜照西坡。支架旁的草地上，可以看见自己车厢的投影。',stages:['西坡 · 向阳面','支架 · 下方投影','西坡 · 越过支架']},
+ {id:'evening',name:'末班',eta:'17:32',alt:'暮色中三盏站灯沿湖岸亮起',forecast:'末班经过旧站台时，请留意窗边的停靠灯。亮满三盏，就快到站了。',stages:['西坡 · 暮色','旧站 · 停靠信号','旧站 · 再次呼叫']}
+];
+let service=services[0];
+const runWindow=$('.run-view');
 cards.forEach((card,i)=>card.onclick=()=>{
+ service=services[i];
+ document.body.dataset.run=service.id;
  for(const b of cards)b.setAttribute('aria-pressed',String(b===card));
- $('#weather').textContent=forecasts[i];$('#other-time').textContent=card.textContent;$('#stub-time').textContent=card.textContent; redraw();
+ const preview=$('#run-preview');
+ preview.src='west-'+service.id+'.png';preview.alt=service.alt;
+ write($('#run-caption'),'西坡右窗 · '+service.name);
+ write($('#run-eta'),'预计抵达 '+service.eta);
+ write($('#weather'),service.forecast);
+ write($('#other-time'),card.textContent);write($('#stub-time'),card.textContent);redraw();
 });
 const clamp=v=>Math.max(0,Math.min(1,v));
 const map=$('.map'),ride=$('.ride'),cross=$('.crossing'),finale=$('.finale');
 const journey=$('.journey');
 const stage=$('.journey-stage');
 const scenes=[...stage.children];
-const durations=[2.5,3.0,4.2,3.1,3.8,6.7,4.7,4.8,7.4];
+const durations=[2.5,4.0,4.2,3.1,3.8,6.7,4.7,4.8,7.4];
 const dissolve=.62;
 let timelineEnd=0;
 const timings=scenes.map((scene,i)=>{
@@ -109,7 +122,18 @@ function paint(){
  const ending=progress(finale),f=clamp(ending/.78);
  map.style.setProperty('--travel',(2+m*96)+'%');map.style.setProperty('--echo',clamp((m-.60)/.20)*.88);map.style.setProperty('--echo-x',(94-32*clamp((m-.58)/.42))+'%');write($('#map-note'),notes[Math.min(2,Math.floor(m*3))]);
  ride.style.setProperty('--rim',(1-clamp(r*2.4))*5+'vw');ride.style.setProperty('--zoom',1+r*.44);ride.style.setProperty('--light',1-r*.45);
- ride.style.setProperty('--lake',clamp((r-.45)/.42)*.52);write($('#ride-cn'),r<.38?'西坡 · 车窗朝北':r<.74?'西坡 · 湖岸亮灯':'西坡 · 即将转向');
+ ride.style.setProperty('--lake',clamp((r-.45)/.42)*.52);write($('#ride-cn'),service.stages[r<.41?0:r<.76?1:2]);
+ const look=smooth(.12,.38,r);
+ ride.style.setProperty('--look',look);
+ ride.style.setProperty('--side-pan',(-2+4*smooth(.2,.93,r))+'%');
+ ride.style.setProperty('--fogbank',.40-.34*smooth(.32,.58,r)+.60*smooth(.70,.95,r));
+ ride.style.setProperty('--stray',smooth(.41,.57,r)*(1-.22*smooth(.85,1,r)));
+ ride.style.setProperty('--shadow-cross',(-130+210*smooth(.42,.90,r))+'%');
+ const signals=smooth(.54,.68,r)*(1-smooth(.70,.78,r));
+ ride.style.setProperty('--lamp-a',Math.max(smooth(.29,.38,r)*(1-smooth(.7,.78,r)),smooth(.85,.91,r)));
+ ride.style.setProperty('--lamp-b',smooth(.41,.49,r)*(1-smooth(.7,.78,r)));
+ ride.style.setProperty('--lamp-c',signals);
+ if(runWindow.getAttribute('aria-label')!==service.alt)runWindow.setAttribute('aria-label',service.alt);
  cross.style.setProperty('--zoom',1+s*.38);cross.style.setProperty('--ghost',clamp((s-.35)/.27)*.84);cross.style.setProperty('--boardscale',.72+s*.48);
  cross.style.setProperty('--key-glint',smooth(.31,.61,s)*(1-.69*smooth(.78,.98,s)));
  cross.style.setProperty('--sway',(8-17*smooth(.25,.73,s)+5*smooth(.75,1,s))+'deg');
@@ -118,7 +142,8 @@ function paint(){
  const sh=progress(shore);
  const pass=sh<.5?sh*2:(sh-.5)*2;
  shore.style.setProperty('--drift',(pass-.5)*5+'%');
- shore.style.setProperty('--shore-light',.84-smooth(.32,.91,sh)*.37);
+ const shoreLight={morning:.86,afternoon:.97,evening:.44}[service.id];
+ shore.style.setProperty('--shore-light',shoreLight*(1-.40*smooth(.32,.91,sh)));
  shore.style.setProperty('--shore-color',.87-smooth(.33,.88,sh)*.51);
  shore.style.setProperty('--pillar',(-125+smooth(.34,.67,sh)*680)+'%');
  write($('#shore-marker'),sh<.49?'WEST PYLON　/　西坡支架':'NORTH FACE　/　北坡');
