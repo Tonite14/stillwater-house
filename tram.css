@@ -58,3 +58,31 @@ body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(14
 .running .guestroom.arrived #back {visibility:visible}
 @media(max-width:800px){.rooms{grid-template-columns:1fr;gap:22px}.room-plate img{height:auto;aspect-ratio:1.55}.room-leaf h2 br{display:none}.key-sampler{margin-top:20px}.far-key{left:63%;top:37%}.room-take>div{background-position:39% center}.room-take{transform-origin:37% 38%}}
 @media(prefers-reduced-motion:reduce){.room-take,.far-key .room-key{transform:none}.room-door{display:none}.journey.running{height:1500svh}}
+
+.ride-again,.replay-key {display:inline-block;border-bottom:1px solid currentColor;font-size:.875rem;margin-top:.7rem}
+.replay-key {margin-right:1.5rem}
+.running .guestroom:not(.arrived) .replay-key {visibility:hidden}
+.pass-omen,.station-omen,.station-omen i {position:absolute;inset:0;pointer-events:none}
+.pass-omen {opacity:var(--omen,0)}
+.station-omen {opacity:var(--passage,0)}
+/* The reflection climbs against gravity on the lake crossing. */
+[data-print=lake] .pass-omen,[data-print=lake] .station-omen {background:linear-gradient(to bottom,transparent calc(var(--level) - 1.2%),#c1e2d374 var(--level),#163e458c calc(var(--level) + 1.2%),#05252ce6);--level:var(--waterline,90%)}
+[data-print=lake] .station-omen {--level:var(--water-level,88%)}
+[data-print=lake] .pass-omen:after,[data-print=lake] .station-omen:after {content:"";position:absolute;inset:var(--level) 0 -12%;background:url(boathouse.png) 48% 98% / 180% 320%;transform:scaleY(-1);opacity:.25;mix-blend-mode:screen}
+[data-print=lake] .night-hatch,[data-print=lake] .roof,[data-print=lake] .near,[data-print=lake] .threshold {display:none}
+[data-print=lake] .nightprint {background-image:url(tidal-window.png);clip-path:inset(var(--flood,100%) 0 0);background-position:58% center}
+[data-print=lake] .room-take {transform-origin:58% 30%}
+/* In the woods a shadow hangs from the roof, then lowers over the bed. */
+[data-print=pine] .pass-omen {background:url(roofglass.png) 65% 18% / cover;mask-image:linear-gradient(#000a,#000c 18%,transparent 65%);transform:translateY(var(--slip,0));filter:brightness(.58) saturate(.45)}
+[data-print=pine] .station-omen,[data-print=pine] .outside,[data-print=pine] .near,[data-print=pine] .threshold {display:none}
+[data-print=pine] .nightprint {clip-path:inset(0 0 var(--canopy,100%) 0)}
+/* A second section of the station slowly shears away and repeats inward. */
+[data-print=ridge] .pass-omen {background:url(skylight.png) center/cover;clip-path:polygon(46% 0,100% 0,100% 100%,56% 100%,51% 60%,54% 52%);transform:translateX(var(--slip,0)) scale(1.16);filter:brightness(.43) sepia(.3)}
+[data-print=ridge] .near,[data-print=ridge] .outside,[data-print=ridge] .threshold,[data-print=ridge] .night-hatch,[data-print=ridge] .roof {display:none}
+[data-print=ridge] .station-omen i {inset:8% 14%;background:url(platform.png) center/cover;border:clamp(8px,1.5vw,26px) solid #282722;border-bottom-color:#484335;box-shadow:0 0 4vw #090b0c;transform:perspective(780px) rotateY(-12deg) rotate(-4deg) scale(var(--nested-scale,.8))}
+[data-print=ridge] .station-omen i+i {inset:23% 32%;transform:perspective(780px) rotateY(8deg) rotate(6deg) scale(var(--nested-scale,.8))}
+[data-print=ridge] .nightprint {background-image:url(split-corridor.png);clip-path:polygon(calc(-6% + var(--rift)) 0,100% 0,100% 100%,calc(-9% + var(--rift)) 100%,calc(-1% + var(--rift)) 66%,calc(-5% + var(--rift)) 43%);background-position:39% center}
+[data-print=ridge] .arrived .nightprint {clip-path:none}
+[data-print=ridge] .room-take {transform:scale(var(--approach,1)) rotate(var(--cant,0deg));transform-origin:41% 39%}
+@media(max-width:800px){[data-print=lake] .room-take>div{background-position:58% center}[data-print=ridge] .room-take>div{background-position:40% center}}
+@media(prefers-reduced-motion:reduce){.pass-omen,[data-print=ridge] .room-take{transform:none}body[data-print] .nightprint{clip-path:none}}
