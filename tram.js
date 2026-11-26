@@ -10,6 +10,7 @@ const services=[
 let service=services[0];
 const runWindow=$('.run-view');
 cards.forEach((card,i)=>card.onclick=()=>{
+ if(service!==services[i])resetEntry();
  service=services[i];
  document.body.dataset.run=service.id;
  for(const b of cards)b.setAttribute('aria-pressed',String(b===card));
@@ -25,7 +26,7 @@ const map=$('.map'),ride=$('.ride'),cross=$('.crossing'),finale=$('.finale');
 const journey=$('.journey');
 const stage=$('.journey-stage');
 const scenes=[...stage.children];
-const durations=[2.5,4.0,4.2,3.1,3.8,6.7,4.7,4.8,7.4];
+const durations=[2.5,4.0,4.2,3.1,3.8,6.7,4.7,3.8,4.8,7.4];
 const dissolve=.62;
 let timelineEnd=0;
 const timings=scenes.map((scene,i)=>{
@@ -115,6 +116,56 @@ function tap(){
  envelope.gain.setValueAtTime(.067,time);envelope.gain.exponentialRampToValueAtTime(.0001,time+.26);
  osc.connect(envelope);envelope.connect(audio.destination);osc.onended=()=>{osc.disconnect();envelope.disconnect()};osc.start();osc.stop(time+.28);
 }
+
+const entry=$('.check-in');
+const entryScene={
+ morning:{title:'早班前台',hint:'柜台上只留了一只铃。',alt:'清晨的接待台，黄铜铃后面是一整墙空钥匙格。',ending:'柜铃又响了一次。'},
+ afternoon:{title:'西翼升降梯',hint:'去湖翼二层，请从铁栅门内上楼。',alt:'午后阳光穿过旧电梯的铜栅门，空轿厢的镜子里还有一扇门。',ending:'门外的层灯又亮起了「Ⅱ」。'},
+ evening:{title:'夜间取钥口',hint:'末班客人的钥匙放在侧门信封里。',alt:'侧门铜制交接窗只开着一道缝，托盘里有一只信封。',ending:'信封已经回到了门缝下。'}
+};
+const answer=$('.entry-answer'),dial=$('.lift-dial'),slipMark=$('#letter-mark');
+let acted=false,bellCount=0,entryTimers=[];
+function later(ms,fn){entryTimers.push(setTimeout(fn,ms))}
+function clearEntryTimers(){entryTimers.forEach(clearTimeout);entryTimers=[]}
+function resetEntry(){
+ clearEntryTimers();acted=false;bellCount=0;
+ entry.classList.remove('answered','moving','rung','echo');
+ write(dial,'Ⅰ');write(answer,'');
+ $('.entry-tools [data-act="lift"]').disabled=false;
+ $('.entry-tools [data-act="letter"]').setAttribute('aria-expanded','false');
+}
+function chime(hz,length){
+ if(!on || !audio || document.hidden || entry.inert)return;
+ const tone=audio.createOscillator(),env=audio.createGain(),now=audio.currentTime;
+ tone.type='sine';tone.frequency.value=hz;env.gain.setValueAtTime(.035,now);env.gain.exponentialRampToValueAtTime(.0001,now+length);
+ tone.connect(env);env.connect(audio.destination);tone.onended=()=>{tone.disconnect();env.disconnect()};tone.start();tone.stop(now+length);
+}
+$('.entry-tools [data-act="ring"]').onclick=()=>{
+ acted=true;bellCount++;clearEntryTimers();entry.classList.remove('rung','echo');
+ void entry.offsetWidth;entry.classList.add('rung');chime(730,.48);write(answer,'柜台　·　'+bellCount+' 声');
+ later(1100,()=>{entry.classList.add('echo');chime(520,.65);write(answer,'柜铃已经停了。楼上传来一声回铃。')});
+};
+$('.entry-tools [data-act="lift"]').onclick=event=>{
+ acted=true;clearEntryTimers();const button=event.currentTarget;button.disabled=true;entry.classList.add('moving');write(dial,'Ⅰ');write(answer,'铁栅门合上了。');
+ later(450,()=>{write(dial,'Ⅱ');chime(392,.35)});
+ later(1150,()=>{write(dial,'Ⅰ');write(answer,'轿厢还在上行。')});
+ later(1950,()=>{write(dial,'Ⅱ');chime(392,.48);entry.classList.remove('moving');write(answer,'二层　／　第二次停靠');button.disabled=false});
+};
+$('.entry-tools [data-act="letter"]').onclick=event=>{
+ acted=true;const opened=entry.classList.toggle('answered');
+ event.currentTarget.setAttribute('aria-expanded',String(opened));
+ write(slipMark,'签收　17:20　／　'+printName);write(answer,opened?'存根上的签收时间，和发车时间一样。':'');
+};
+$('.entry-shortcut').addEventListener('click',event=>{
+ if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+ event.preventDefault();const beat=timings.find(t=>t.scene===entry);
+ const bounds=journey.getBoundingClientRect();
+ const y=scrollY+bounds.top+(bounds.height-stage.offsetHeight)*(beat.start+.27*(beat.end-beat.start))/timelineEnd;
+ window.scrollTo({top:y,behavior:'instant'});paint();
+ const action={morning:'ring',afternoon:'lift',evening:'letter'}[service.id];
+ entry.querySelector('[data-act="'+action+'"]').focus({preventScroll:true});
+});
+
 function paint(){
  advanceJourney();
  const path=paths[document.body.dataset.print];
@@ -189,6 +240,11 @@ function paint(){
  arrival.style.setProperty('--porch-light',.91-.18*smooth(.75,1,walk));
  arrival.style.setProperty('--arrival-ink',smooth(.10,.20,walk)*(1-smooth(.30,.44,walk))+.88*smooth(.62,.69,walk)*(1-smooth(.78,.92,walk)));
  write($('#arrival-caption'),walk<.50?'湖岸步道':'正门 · 晚间入口');
+ const check=progress(entry),visit=entryScene[service.id];
+ entry.style.setProperty('--entry-scale',1+.14*smooth(.12,.94,check));
+ write($('#entry-service'),$('.times [aria-pressed="true"]').textContent+'　／　'+service.name);
+ write($('#entry-title'),visit.title);write($('#entry-prompt'),visit.hint);
+ if($('.entry-plate').getAttribute('aria-label')!==visit.alt)$('.entry-plate').setAttribute('aria-label',visit.alt);
  const hall=progress(landing);
  landing.style.setProperty('--pace',1+.17*smooth(.08,.35,hall)+.58*smooth(.58,.94,hall));
  landing.style.setProperty('--daylight',.68-.16*smooth(.12,.43,hall));
@@ -205,6 +261,7 @@ function paint(){
  const strike=room>=.82 && loadedShot===key;
  const shutter=.87*smooth(.735,.815,room)*(1-smooth(.82,.86,room));
  guestroom.classList.toggle('strike',strike);
+ guestroom.classList.toggle('entry-recalled',acted&&strike);
  const occupied=smooth(.38,.56,room);
  guestroom.style.setProperty('--ajar',(-5-103*smooth(.08,.49,room))+'%');
  guestroom.style.setProperty('--exposure',.15*(1-smooth(.15,.34,room))+.89*dip+shutter);
@@ -218,7 +275,7 @@ function paint(){
  guestroom.style.setProperty('--credit',(1-smooth(.28,.46,room))+smooth(.934,.982,room));
  guestroom.classList.toggle('arrived',room>.95);
  $('#back').tabIndex=room>.95?0:-1;
- write($('#night-line'),room<.51?'湖景客房 · 二层':'房卡已取　／　'+printName);
+ write($('#night-line'),room<.51?'湖景客房 · 二层':(acted?visit.ending:'房卡已取　／　'+printName));
  const roomAlt=strike?lastShots[key][1]:occupied>.6?path.alt:'从门口望见床头的铜灯与湖景窗';
  if(roomView.getAttribute('aria-label')!==roomAlt)roomView.setAttribute('aria-label',roomAlt);
  if(on && lastRoom<.53 && room>=.53 && room-lastRoom<.1)tap();
@@ -273,16 +330,17 @@ stage.addEventListener('pointermove',event=>{
  landing.style.setProperty('--beam-y',(100*clamp((event.clientY-box.top)/box.height))+'%');
 },{passive:true});
 function startFresh(event){
- event.preventDefault();dismissNote();furthest=0;
+ event.preventDefault();dismissNote();resetEntry();furthest=0;
  for(const [el,threshold,normal] of memories)write(el,normal);
  const anchor=event.currentTarget.hash;
  history.replaceState(null,'',anchor);
- const target=anchor==='#top'?$('.logo'):$('.print-picks [aria-pressed="true"]');
+ const target=anchor==='#top'?$('.logo'):anchor==='#service'?$('.times [aria-pressed="true"]'):$('.print-picks [aria-pressed="true"]');
  const section=document.querySelector(anchor);
  window.scrollTo({top:anchor==='#top'?0:section.getBoundingClientRect().top+scrollY-68,behavior:'instant'});
  target.focus({preventScroll:true});redraw();
 }
 $('#back').addEventListener('click',startFresh);
+$('.replay-service').addEventListener('click',startFresh);
 $('.replay-key').addEventListener('click',startFresh);
 
 let frame=0;function redraw(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;paint()})}

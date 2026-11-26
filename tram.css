@@ -188,3 +188,30 @@ body[data-run=morning]{--side-image:url(west-morning.png)}body[data-run=afternoo
 .run-signals i:after{content:"";position:absolute;inset:1px;border-radius:100%;background:#ffce79;box-shadow:0 0 8px #fac66b}
 .run-signals i:nth-of-type(1):after{opacity:var(--lamp-a,0)}.run-signals i:nth-of-type(2):after{opacity:var(--lamp-b,0)}.run-signals i:nth-of-type(3):after{opacity:var(--lamp-c,0)}
 @media(prefers-reduced-motion:reduce){.run-view,.run-fog{transform:none}.run-shadow{transform:none!important}}
+
+.entry-shortcut,.replay-service{display:inline-block;font-size:.875rem;border-bottom:1px solid currentColor;margin:.75rem 1rem 0 0}
+.boarding-link{margin-right:1rem}
+.running .guestroom:not(.arrived) .replay-service{visibility:hidden}
+.check-in{background:#131810;color:#fff3dd;height:340svh}
+.entry-screen{position:sticky;top:0;height:100svh;overflow:hidden;isolation:isolate}
+.entry-plate{position:absolute;inset:0;background:center/cover no-repeat;transform:scale(var(--entry-scale,1))}
+[data-run=morning] .entry-plate{background-image:url(entry-morning.png)}
+[data-run=afternoon] .entry-plate{background-image:url(entry-afternoon.png)}
+[data-run=evening] .entry-plate{background-image:url(entry-evening.png)}
+.entry-copy{position:absolute;left:6vw;bottom:8svh;background:#101812df;padding:16px 23px;max-width:min(88vw,360px);border-left:2px solid #b7925b;z-index:2}
+.entry-copy h2{font:500 clamp(26px,4vw,52px)/1.25 var(--serif);margin:.12em 0}.entry-copy p{font-size:.94rem}
+.entry-tools button{display:none;background:#ded3b8;color:#29362d;border:1px solid #e6ddc6;padding:6px 14px;margin-top:12px;cursor:pointer;font:inherit}
+[data-run=morning] [data-act=ring],[data-run=afternoon] [data-act=lift],[data-run=evening] [data-act=letter]{display:inline-block}
+.entry-answer:not(:empty){margin-top:10px;color:#f0d3a4;font-size:.9rem}
+.lift-dial,.letter-slip,.bell-wave{display:none;position:absolute;pointer-events:none}
+[data-run=afternoon] .lift-dial{display:block;top:17%;left:50%;transform:translateX(-50%);background:#212016;border:3px double #958254;border-radius:50% 50% 4px 4px;color:#e1c692;padding:3px 21px;text-align:center;font:28px Georgia}
+.check-in.moving .entry-plate{animation:lift-cross 1.9s ease-in-out}
+@keyframes lift-cross{0%,100%{filter:brightness(1)}50%{filter:brightness(.26);transform:scale(1.12) translateY(2.5%)}}
+[data-run=morning] .rung .bell-wave{display:block;top:57%;left:50%;width:100px;height:42px;border:2px solid #fff0bf;border-radius:50%;animation:ring-away .7s ease-out both}
+[data-run=morning] .echo .bell-wave{top:28%;width:60px;height:23px;animation:reply-away .85s ease-out both}
+@keyframes ring-away{from{transform:translate(-50%,-50%) scale(.45);opacity:.8}to{transform:translate(-50%,-50%) scale(2.3);opacity:0}}
+@keyframes reply-away{from{transform:translate(-50%,-50%) scale(.4);opacity:.65}to{transform:translate(-50%,-50%) scale(2.3);opacity:0}}
+[data-run=evening] .answered .letter-slip{display:grid;gap:10px;left:51%;top:39%;padding:18px 28px;background:#e1d4af;color:#342f23;border-top:5px solid #897450;box-shadow:0 8px 25px #0008;transform:rotate(-5deg);font-family:monospace}
+.letter-slip b{font:46px Georgia}.letter-slip span{border-top:1px dashed;padding-top:8px}
+@media(max-width:680px){.entry-copy{left:5vw;bottom:6svh}.entry-copy h2{font-size:27px}.letter-slip{left:35%!important;top:22%!important}.entry-shortcut{margin-right:0}}
+@media(prefers-reduced-motion:reduce){.check-in .entry-plate{animation:none;transform:none}.entry-screen .bell-wave{display:none!important}}
