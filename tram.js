@@ -17,6 +17,15 @@ $('#sound').onclick=async()=>{
  if(!audio){audio=new AudioContext();gain=audio.createGain();gain.gain.value=0;hum=audio.createOscillator();hum.type='triangle';hum.frequency.value=56;hum.connect(gain);gain.connect(audio.destination);hum.start()}
  await audio.resume();on=!on;gain.gain.setTargetAtTime(on?.035:0,audio.currentTime,.35);$('#sound').setAttribute('aria-pressed',String(on));$('#sound').textContent=on?'声音开':'声音关';
 };
+const seatButtons=[...document.querySelectorAll('.seat-picks button')];
+const seatViews=[['skylight.png','从座位仰望观景窗，窗外是天光与树梢','顶窗'],['cabin.png','从前排座位望向缆线与前方的旅馆','前排']];
+seatButtons.forEach((button,index)=>button.onclick=()=>{
+ const [src,alt,caption]=seatViews[index];$('#seat-view').src=src;$('#seat-view').alt=alt;
+ write($('#seat-caption'),'车内导览　／　'+caption);
+ seatButtons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));
+});
+const listening=$('.listening');
+let lastInterval=0;
 const shore=$('.shorepass');
 function smooth(from,to,p){const t=clamp((p-from)/(to-from));return t*t*(3-2*t)}
 let previousFinal=0;
@@ -41,8 +50,18 @@ function paint(){
  shore.style.setProperty('--pillar',(-125+smooth(.34,.67,sh)*680)+'%');
  write($('#shore-marker'),sh<.49?'WEST PYLON　/　西坡支架':'NORTH FACE　/　北坡');
  write($('#shore-label'),sh<.28?'右窗 · 湖岸':sh<.53?'西坡支架':sh<.79?'右窗 · 背山侧':'红屋顶。右边的木桩上，还是那条白船。');
- const outside=smooth(.67,.80,f);
- const roof=smooth(.855,.947,f);
+ const pause=progress(listening);
+ listening.style.setProperty('--tilt',1+.14*pause);
+ listening.style.setProperty('--ambient',.78-.46*smooth(.13,.95,pause));
+ listening.style.setProperty('--tint',.82-.4*pause);
+ listening.style.setProperty('--sweep',(-95+smooth(.10,.6,pause)*185)+'%');
+ write($('#interval'),pause<.42?'两座支架之间':pause<.78?'已驶出林线':'头顶还有枝条擦过玻璃。');
+ if(on && pause>lastInterval && pause-lastInterval<.10 && [.34,.41,.84].some(t=>lastInterval<t && pause>=t))tap();
+ lastInterval=pause;
+ const outside=smooth(.59,.70,f);
+ finale.style.setProperty('--ceiling',smooth(.71,.79,f));
+ finale.style.setProperty('--turn',(32*smooth(.79,.87,f))+'deg');
+ const roof=smooth(.877,.969,f);
  finale.style.setProperty('--roof',roof);
  finale.style.setProperty('--roof-scale',1+.12*smooth(.90,1,f));
  if(on && f>previousFinal && f-previousFinal<.12 && [.40,.50,.848].some(t=>previousFinal<t && f>=t))tap();
@@ -53,7 +72,8 @@ function paint(){
  const closed=smooth(.15,.32,f),opening=smooth(.42,.63,f);
  finale.style.setProperty('--open',1-closed+opening);finale.style.setProperty('--near',f>.35?1:0);finale.style.setProperty('--lean',1+.26*clamp((f-.7)/.3));
  write($('#end-en'),f<.47?'TERMINUS':f<.78?'RETURN SERVICE':'LOWER STATION');
- write($('#end-cn'),f<.28?'旅馆站':f<.48?'请先下后上。':f<.67?'车门已关闭':f<.85?'车内无人按铃。':f<.95?'声响来自车顶。':'到站后，请从另一侧下车。');
+ write($('#end-cn'),f<.28?'旅馆站':f<.48?'请先下后上。':f<.71?'车门已关闭':f<.82?'观景窗　／　已合锁':f<.969?'观景窗　／　已开启':'到站后，请从另一侧下车。');
+ if(on)gain.gain.setTargetAtTime(.035*(1-.85*smooth(.72,.87,f))+.011*smooth(.91,.99,f),audio.currentTime,.3);
  if(hum)hum.frequency.setTargetAtTime(56+m*9-r*11-s*6+f*9,audio.currentTime,.3);
 }
 let frame=0;function redraw(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;paint()})}
