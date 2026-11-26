@@ -26,8 +26,38 @@ const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 const cover=document.querySelector('.hero');
 const clock=document.querySelector('.stay-clock');
 const clockTime=clock.querySelector('time');
-const stops=[...document.querySelectorAll('.chapter,.night,.end')].map(section=>({
- section,time:section.querySelector('.stamp')?.textContent.trim().slice(0,5)||(section===hall?'03:17':'03:16')
+const plans=[
+['07:00 — 09:00','窗边的早餐桌','烤面包每天七点出炉。带上一杯热咖啡，从餐厅的侧门就能走到湖边。'],
+['14:00 — 16:00','沿旧邮路散步','在前台借一只帆布包。沿白桦树走到旧邮筒，再沿湖岸折返，约四十分钟。'],
+['17:30 — 18:30','去西廊看落日','二楼西廊能看见最后一束光。尽头那扇带铜圆窗的门，就是湖景房。']];
+const tabs=[...document.querySelectorAll('.daytabs button')];
+tabs.forEach((tab,i)=>tab.onclick=()=>{
+  tabs.forEach((b,k)=>b.setAttribute('aria-pressed',String(i===k)));
+  const card=tab.parentNode.nextElementSibling;
+  [...card.children].forEach((node,k)=>node.textContent=plans[i][k]);
+});
+const walks=[...document.querySelectorAll('.landing-walk')];
+const passages=[
+[['沿西廊去你的房间。','左手一排窗都朝着湖，天气好的傍晚可以一路晒着太阳。'],['认准绿色门框。','老木匠给每一扇门留了不同的记号。207 的门上有一扇铜圆窗。'],['回前台很好找。','记住这条路：出门右转，下楼一层。楼梯尽头就是前台。']],
+[['从客房下楼。','楼梯间的灯还亮着。推开防火门，向下走一层。'],['你又看见了那扇铜圆窗。','刚才你明明下了楼。绿门框，右边的壁灯，灯下那道裂缝，都在原来的地方。'],['这一次，门从里面开了。','圆窗里映着你的背影。有人从门内轻轻说：「还差一层。」']]];
+function followWalks(){
+  for(const [i,walk] of walks.entries()){
+    const rect=walk.getBoundingClientRect();
+    if(rect.bottom<0||rect.top>innerHeight)continue;
+    const progress=clamp(-rect.top/Math.max(1,rect.height-innerHeight));
+    const beat=Math.min(2,Math.floor(progress*3));
+    walk.style.setProperty('--dolly',String(1+progress*(i?1.2:.36)));
+    walk.style.setProperty('--exposure',String(i?.53-progress*.2:1-progress*.12));
+    walk.style.setProperty('--color',String(i?.45:1-progress*.15));
+    if(walk.dataset.beat!==String(beat)){
+      walk.dataset.beat=beat;
+      walk.querySelector('h2').textContent=passages[i][beat][0];
+      walk.querySelector('p').textContent=passages[i][beat][1];
+    }
+  }
+}
+const stops=[...document.querySelectorAll('.chapter,.night,.end,.landing-walk')].map(section=>({
+ section,time:section.querySelector('.stamp')?.textContent.trim().slice(0,5)||(section.matches('.arrival-walk')?'18:45':section.matches('.return-walk')?'03:14':section===hall?'03:17':'03:16')
 }));
 const observer=new IntersectionObserver(entries=>{
   for(const {target,isIntersecting} of entries){
@@ -49,6 +79,7 @@ function moveCoverAndClock(){
 
 function update(){
   moveCoverAndClock();
+  followWalks();
   const lakeProgress=clamp((innerHeight-lake.getBoundingClientRect().top)/(innerHeight+lake.offsetHeight));
   lake.style.setProperty('--window-zoom',1+lakeProgress*.45);
   for(const item of disturbances){
