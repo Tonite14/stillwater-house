@@ -50,7 +50,7 @@ body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(14
 .room-take {transform:scale(var(--approach,1));transform-origin:36% 37%}
 .room-take>div {background-position:47% 45%;background-size:cover}
 .lamplight {background-image:url(lake-room.png);filter:brightness(.48) saturate(.49)}
-.nightprint {background-image:url(room-after-dark.png);opacity:var(--occupied,0)}
+.nightprint {background-image:url(room-after-dark.png?v=9cf3e87);opacity:var(--occupied,0)}
 .room-dark {background:#070b0c;opacity:var(--exposure,.3)}
 .room-door {background:linear-gradient(88deg,#0b0d0b 73%,#181a15 96%,#352d20 99.5%,#7f6641);right:auto;width:100%;transform:translateX(var(--ajar,-7%));box-shadow:8px 0 32px #050807b8}
 .night-credit {position:absolute;left:7vw;bottom:9svh;text-shadow:0 1px 6px #060706,0 1px 13px #000;opacity:var(--credit,1)}
