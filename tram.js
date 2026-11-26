@@ -12,7 +12,7 @@ const map=$('.map'),ride=$('.ride'),cross=$('.crossing'),finale=$('.finale');
 const journey=$('.journey');
 const stage=$('.journey-stage');
 const scenes=[...stage.children];
-const durations=[2.5,3.0,4.2,3.1,3.0,8.2];
+const durations=[2.5,3.0,4.2,3.1,3.8,7.6,5.8];
 const dissolve=.62;
 let timelineEnd=0;
 const timings=scenes.map((scene,i)=>{
@@ -55,6 +55,19 @@ seatButtons.forEach((button,index)=>button.onclick=()=>{
  write($('#seat-caption'),'车内导览　／　'+caption);
  seatButtons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));
 });
+const guestroom=$('.guestroom');
+const roomView=$('.room-take');
+const printChoices=[...document.querySelectorAll('.print-picks button')];
+const printedNames=[...document.querySelectorAll('[data-key-name]')];
+let printName='湖纹';
+printChoices.forEach(button=>button.addEventListener('click',()=>{
+ document.body.dataset.print=button.dataset.print;
+ printName=button.textContent;
+ printedNames.forEach(label=>write(label,printName));
+ printChoices.forEach(choice=>choice.setAttribute('aria-pressed',String(choice===button)));
+ redraw();
+}));
+let lastRoom=0;
 const listening=$('.listening');
 let lastInterval=0;
 const shore=$('.shorepass');
@@ -74,6 +87,9 @@ function paint(){
  ride.style.setProperty('--rim',(1-clamp(r*2.4))*5+'vw');ride.style.setProperty('--zoom',1+r*.44);ride.style.setProperty('--light',1-r*.45);
  ride.style.setProperty('--lake',clamp((r-.45)/.42)*.52);write($('#ride-cn'),r<.38?'西坡 · 车窗朝北':r<.74?'西坡 · 湖岸亮灯':'西坡 · 即将转向');
  cross.style.setProperty('--zoom',1+s*.38);cross.style.setProperty('--ghost',clamp((s-.35)/.27)*.84);cross.style.setProperty('--boardscale',.72+s*.48);
+ cross.style.setProperty('--key-glint',smooth(.31,.61,s)*(1-.69*smooth(.78,.98,s)));
+ cross.style.setProperty('--sway',(8-17*smooth(.25,.73,s)+5*smooth(.75,1,s))+'deg');
+ cross.style.setProperty('--card-size',.43+.40*smooth(.28,.79,s));
  write($('#station-note'),s<.4?'对向车在这里交会。':s<.78?'对面的窗亮了一下。':'对向车 · 上行');
  const sh=progress(shore);
  const pass=sh<.5?sh*2:(sh-.5)*2;
@@ -107,11 +123,25 @@ function paint(){
  finale.style.setProperty('--inside',ending>=.84?1:0);
  finale.style.setProperty('--inside-scale',1+.13*smooth(.89,.99,ending));
  finale.style.setProperty('--edge',.58*smooth(.89,.99,ending));
- finale.classList.toggle('arrived',ending>.958);
- $('#back').tabIndex=ending>.958?0:-1;
+ 
  finale.style.setProperty('--open',1-closed+opening-secondClose+secondOpen);finale.style.setProperty('--near',f>.35?1:0);finale.style.setProperty('--lean',1+.26*clamp((f-.7)/.3));
  write($('#end-en'),ending>.84?'IN SERVICE':f<.47?'TERMINUS':f<.78?'RETURN SERVICE':'ROOF WINDOW');
  write($('#end-cn'),ending>.958?'乘客一位。':ending>.835?'车内照明已恢复':f<.28?'旅馆站':f<.48?'请先下后上。':f<.71?'车门已关闭':f<.82?'观景窗　／　已合锁':'观景窗　／　已开启');
+ const room=progress(guestroom);
+ const dip=smooth(.35,.54,room)*(1-smooth(.59,.81,room));
+ const occupied=smooth(.47,.66,room);
+ guestroom.style.setProperty('--ajar',(-5-103*smooth(.08,.49,room))+'%');
+ guestroom.style.setProperty('--exposure',.15*(1-smooth(.15,.34,room))+.89*dip);
+ guestroom.style.setProperty('--occupied',occupied);
+ guestroom.style.setProperty('--approach',1+.075*smooth(.08,.43,room)+.66*smooth(.66,.975,room));
+ guestroom.style.setProperty('--credit',(1-smooth(.28,.46,room))+smooth(.86,.97,room));
+ guestroom.classList.toggle('arrived',room>.95);
+ $('#back').tabIndex=room>.95?0:-1;
+ write($('#night-line'),room<.51?'湖景客房 · 二层':'房卡已取　／　'+printName);
+ const roomAlt=occupied>.6?'床头灯亮起，床头上方一名倒悬的侍者正俯身向你看来':'从门口望见床头的铜灯与湖景窗';
+ if(roomView.getAttribute('aria-label')!==roomAlt)roomView.setAttribute('aria-label',roomAlt);
+ if(on && lastRoom<.53 && room>=.53 && room-lastRoom<.1)tap();
+ lastRoom=room;
  if(on)gain.gain.setTargetAtTime((.035*(1-.85*smooth(.72,.87,f))+.011*smooth(.91,.99,f))*(1-smooth(.80,.84,ending)),audio.currentTime,.3);
  if(hum)hum.frequency.setTargetAtTime(56+m*9-r*11-s*6+f*9,audio.currentTime,.3);
 }

@@ -21,3 +21,40 @@
 .running .arrived #back {visibility:visible}
 footer {background:#141a17;color:#d3d1bf;border-top:1px solid #343b35}
 @media(prefers-reduced-motion:reduce){.journey.running{height:1250svh}.threshold{transform:none}}
+
+/* Lake wing photographic spread and printed room cards */
+.rooms {display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:center;gap:clamp(28px,5vw,100px);padding:10vh 6vw 7vh}
+.room-plate {position:relative;isolation:isolate;overflow:hidden}
+.room-plate img {display:block;width:100%;height:clamp(360px,66svh,750px);object-fit:cover;object-position:57% center}
+.plate-credit {position:absolute;bottom:16px;left:16px;padding:5px 12px;background:#f6f0dd;color:#25372f;font-size:.8rem;letter-spacing:.12em}
+.room-leaf h2 {margin:16px 0 22px;font-weight:530;font-family:"Songti SC","Noto Serif CJK SC",SimSun,serif}
+.room-leaf>p {max-width:27em}
+.key-sampler {display:flex;align-items:center;gap:clamp(14px,2.4vw,50px);margin-top:30px;padding:25px 0 8px;border-top:1px solid #8e9a83}
+.key-controls h3 {margin:0;font-size:1.12rem}.key-controls>p {margin:.4rem 0 1rem;max-width:17em;font-size:.92rem}
+.print-picks {display:flex;gap:5px;flex-wrap:wrap}.print-picks button {border:1px solid #8c9988;background:transparent;border-radius:3px;padding:4px 10px;font-size:.88rem}
+.print-picks [aria-pressed=true] {background:#253c32;color:#fff4d8}
+body {--key-ink:#244e59;--key-art:repeating-radial-gradient(ellipse at 20% -140%,transparent 0 5px,currentColor 5.5px 7px,transparent 8px 10px)}
+body[data-print=pine] {--key-ink:#31533c;--key-art:repeating-conic-gradient(from 45deg at 50% 84%,currentColor 0 42deg,transparent 43deg 88deg,currentColor 89deg 91deg,transparent 92deg 360deg) 0 0 / 16px 13px}
+body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(142deg,transparent 0 5px,currentColor 6px 8px,transparent 9px 13px)}
+.room-key {width:92px;height:145px;flex:none;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:11px;background:#ece2bf;color:var(--key-ink);border:2px solid #b9a881;box-shadow:inset 0 0 0 3px #e9dab1,inset 0 0 0 4px currentColor,1px 5px 8px #25362b29;transform:rotate(-6deg);font-family:Georgia,serif;line-height:1}
+.eyelet {width:9px;height:9px;border-radius:100%;background:#514c3d;border:2px solid #aa925f}
+.room-key span {margin-top:3px;font:7px/1.2 monospace;letter-spacing:.08em}
+.room-key b {font-size:35px;font-weight:normal}.room-key em {font:11px/1.3 SimSun,serif;letter-spacing:.18em}
+.key-print {width:73%;height:25px;color:var(--key-ink);background:var(--key-art);border-block:1px solid currentColor}
+.far-key {position:absolute;top:30%;left:65%;width:92px;transform-origin:50% 0;transform:perspective(360px) rotateY(-21deg) rotate(var(--sway,0deg)) scale(var(--card-size,.4));opacity:var(--key-glint,0);filter:brightness(.86) saturate(.72);pointer-events:none}
+.far-key:before {content:"";position:absolute;bottom:96%;left:49%;width:2px;height:90px;background:#9e9a80}
+.other-board {opacity:calc(var(--ghost,0) * .55)}
+.guestroom {background:#090a09;color:#f2e6ce;height:400svh}
+.room-screen {position:sticky;height:100svh;top:0;overflow:hidden;background:#080b0a;isolation:isolate}
+.room-take,.room-take>div,.room-dark,.room-door {position:absolute;inset:0;pointer-events:none}
+.room-take {transform:scale(var(--approach,1));transform-origin:36% 37%}
+.room-take>div {background-position:47% 45%;background-size:cover}
+.lamplight {background-image:url(lake-room.png);filter:brightness(.48) saturate(.49)}
+.nightprint {background-image:url(room-after-dark.png);opacity:var(--occupied,0)}
+.room-dark {background:#070b0c;opacity:var(--exposure,.3)}
+.room-door {background:linear-gradient(88deg,#0b0d0b 73%,#181a15 96%,#352d20 99.5%,#7f6641);right:auto;width:100%;transform:translateX(var(--ajar,-7%));box-shadow:8px 0 32px #050807b8}
+.night-credit {position:absolute;left:7vw;bottom:9svh;text-shadow:0 1px 6px #060706,0 1px 13px #000;opacity:var(--credit,1)}
+.night-credit p {font:clamp(18px,2.4vw,36px)/1.6 "Songti SC",SimSun,serif;letter-spacing:.13em}
+.running .guestroom.arrived #back {visibility:visible}
+@media(max-width:800px){.rooms{grid-template-columns:1fr;gap:22px}.room-plate img{height:auto;aspect-ratio:1.55}.room-leaf h2 br{display:none}.key-sampler{margin-top:20px}.far-key{left:63%;top:37%}.room-take>div{background-position:39% center}.room-take{transform-origin:37% 38%}}
+@media(prefers-reduced-motion:reduce){.room-take,.far-key .room-key{transform:none}.room-door{display:none}.journey.running{height:1500svh}}
