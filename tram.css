@@ -118,3 +118,56 @@ body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(14
 .guestroom.strike .night-credit{padding:.6rem 1rem .7rem;background:#0a0c0bd1;border-left:1px solid #c7ba97}
 .guestroom.strike .night-credit p{font-size:clamp(16px,1.6vw,24px)}
 @media(prefers-reduced-motion:reduce){.guestroom.strike .impact-shot img{animation:none}}
+
+:root{--paper:#f5f1e7;--evergreen:#20372e;--serif:"Songti SC","Noto Serif CJK SC","STSong",SimSun,serif}
+html{scroll-padding-top:76px}
+body{background:var(--paper)}
+#mast{position:sticky;top:0;z-index:16;height:68px;gap:1rem;background:var(--paper);color:var(--evergreen);border-color:#b4b6a8;transition:background .55s,color .55s,border-color .55s}
+#mast .logo{display:flex;align-items:center;gap:.65rem}
+.wordmark{font:600 1.15rem/1.25 var(--serif);letter-spacing:.15em}
+.wordmark small{display:block;margin-top:.3em;font:8px/1.2 Georgia,serif;letter-spacing:.22em}
+#mast .mark{width:32px;height:32px;background:transparent;border:1px solid currentColor;color:inherit;font:26px/1 Georgia}
+#mast nav{gap:clamp(10px,1.8vw,28px)}
+#mast .desk-open{padding:5px 12px;border:1px solid currentColor;border-radius:0;display:flex;align-items:center;gap:8px}
+#mast #sound{border:0;padding:4px 0;background:transparent;color:inherit}
+.desk-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.48}
+.depth-rule{position:absolute;bottom:-1px;left:0;width:100%;height:2px;background:#c67a4e;transform:scaleX(var(--read,0));transform-origin:left}
+body[data-tone=mist] #mast{background:#c6cec2;color:#28372d;border-color:#909b8d}
+body[data-tone=night] #mast{background:#18241f;color:#dfddc7;border-color:#465148}
+body[data-tone=carbon] #mast{background:#101511;color:#bcb9aa;border-color:#383e35}
+body[data-tone=carbon] .wordmark{letter-spacing:.23em;text-shadow:1px 0 #773e31}
+body.has-mail .desk-dot{background:#cc7950;opacity:1;box-shadow:0 0 0 3px #a9684629}
+body[data-tone=carbon] .depth-rule{background:#9e634c}
+.poster{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;min-height:calc(100svh - 68px);margin:0;padding:clamp(42px,7vh,92px) 6vw 0;color:#fff9e9;background:#27392f}
+.poster figure{position:absolute;inset:0;z-index:-2;min-height:0;height:100%}
+.poster img{object-position:60% center}
+.poster:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#0c201be3,transparent 73%),linear-gradient(0deg,#0a160f85,transparent 54%)}
+.postertext{align-self:flex-start;padding:0 0 clamp(38px,6vh,84px);width:min(620px,90%)}
+.postertext small{display:block;color:#e3d4ae;letter-spacing:.21em}
+.poster h1{font:500 clamp(76px,min(12vw,16vh),178px)/1.08 var(--serif);letter-spacing:.015em;margin:.19em 0 .14em}
+.poster h1 br{display:none}.poster h1 i{font-weight:400;color:#fff1d0}
+.postertext p{font:400 clamp(17px,1.6vw,25px)/1.7 var(--serif);letter-spacing:.12em}
+.postertext p br{display:none}
+.poster-link{display:inline-flex;align-items:center;gap:24px;border-bottom:1px solid #dfd5b6;margin-top:24px;padding:4px 0;font-size:14px}
+.poster-link i{font:18px Georgia}.posterfoot{padding:17px 0 20px;border-top:1px solid #dcd3ae88;border-bottom:0}.posterfoot b{font-weight:500}.posterfoot em{color:#d8b88a}
+.brochure h2,.fieldguide h2,.arrival-guide h2,.service h2,.seat-guide h2{font-family:var(--serif);font-weight:500}
+#desk{position:fixed;background:transparent;border:0;color:#263b32;padding:12px;width:min(390px,94vw);max-height:90svh}
+#desk::backdrop{background:#07120dc2;backdrop-filter:blur(3px)}
+.desk-inner{background:#efe8d6;padding:22px 26px 31px;box-shadow:0 8px 32px #040c0766;border-top:5px solid #365745}
+.desk-head,.desk-inner dl div{display:flex;justify-content:space-between;align-items:center}
+.desk-head small{letter-spacing:.19em}.desk-head button{background:none;border:0;color:inherit;font:28px/1 Georgia;padding:4px 6px}
+.desk-inner h2{font:500 34px/1.25 var(--serif);margin:14px 0}.desk-inner dl{margin:16px 0;border-block:1px dashed #919882;padding:12px 0}
+.desk-inner dl div{padding:4px 0}.desk-inner dd{margin:0;font-family:monospace;font-size:1rem}.desk-inner dt,.desk-inner p{font-size:.92rem}.desk-inner>a{display:inline-block;margin-top:16px;border-bottom:1px solid;font-size:14px}
+body.has-mail .desk-inner{border-color:#874c34}
+.desk-note{position:fixed;right:4vw;top:84px;z-index:12;max-width:min(260px,72vw);padding:10px 16px 11px;background:#e5dfcb;color:#243a2f;border-left:2px solid #95613e;opacity:0;transform:translateY(-5px);transition:opacity .65s,transform .65s;pointer-events:none;box-shadow:0 5px 20px #070d0a24}
+.desk-note small{display:block;color:#73614d;font-size:.73rem}.desk-note.show{opacity:1;transform:none}.desk-note span{font:1rem/1.7 var(--serif)}
+body[data-tone=carbon] .desk-note{background:#1e251e;color:#e2daca}
+.reading-light{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse min(32vw,360px) min(34vh,270px) at var(--beam-x,50%) var(--beam-y,50%),transparent 12%,#01060455 70%,#010604c7 130%);opacity:var(--beam,0)}
+@media(max-width:680px){html{scroll-padding-top:55px}#mast{padding:0 4vw;height:55px;gap:5px}#mast nav{gap:9px}#mast nav>a:nth-child(1),#mast nav>a:nth-child(3){display:none}.wordmark{font-size:.96rem}.wordmark small{font-size:6px}.poster{min-height:calc(88svh - 55px)}.poster h1{font-size:clamp(56px,14.8vw,94px)}.postertext{width:100%}.poster figure{height:100%}.postertext small{font-size:10px}.desk-note{top:65px}.reading-light{background:radial-gradient(ellipse at 50% 50%,transparent 18%,#020703aa 95%)}}
+@media(prefers-reduced-motion:reduce){#mast,.desk-note{transition:none}.reading-light{background:radial-gradient(ellipse at center,transparent 20%,#02070388)}}
+
+.counterfoil{position:relative}.receipt-stamp{display:none}
+#desk[data-signed] .counterfoil{min-height:60px;padding-right:62px}
+#desk[data-signed] .receipt-stamp{display:block;position:absolute;right:0;top:5px;border:3px double #864938;color:#864938;padding:2px 5px;transform:rotate(-12deg);font:600 1rem/1.4 var(--serif);letter-spacing:.1em}
+body[data-tone=night] .running .label,body[data-tone=carbon] .running .label{border-left-color:#89765d;font-family:var(--serif)}
+body[data-tone=night] .running .label small,body[data-tone=carbon] .running .label small{letter-spacing:.23em}

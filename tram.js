@@ -5,7 +5,7 @@ turn.onclick=()=>{postback.hidden=!postback.hidden;turn.setAttribute('aria-expan
 const forecasts=['晨雾贴着水面。坐右边，能看见码头。','午后的光落在西坡。经过支架时，留意湖面的影子。','末班车会经过亮灯的旅馆。日落后，请把车窗留一条缝。'];
 cards.forEach((card,i)=>card.onclick=()=>{
  for(const b of cards)b.setAttribute('aria-pressed',String(b===card));
- $('#weather').textContent=forecasts[i];$('#other-time').textContent=card.textContent;$('#stub-time').textContent=card.textContent;
+ $('#weather').textContent=forecasts[i];$('#other-time').textContent=card.textContent;$('#stub-time').textContent=card.textContent; redraw();
 });
 const clamp=v=>Math.max(0,Math.min(1,v));
 const map=$('.map'),ride=$('.ride'),cross=$('.crossing'),finale=$('.finale');
@@ -173,6 +173,7 @@ function paint(){
  const hallDescription=hall<.49?'沿着红色地毯走向尽头的绿门':hallDescriptions[document.body.dataset.print];
  if(landingView.getAttribute('aria-label')!==hallDescription)landingView.setAttribute('aria-label',hallDescription);
  const room=progress(guestroom);
+ updateFrontDesk(m,r,pause,s,walk,hall,room);
  const key=document.body.dataset.print;
  if(hall>0 || room>0)prepareCloseup(key);
  const dip=smooth(.27,.41,room)*(1-smooth(.45,.63,room));
@@ -200,5 +201,64 @@ function paint(){
  if(on)gain.gain.setTargetAtTime((.035*(1-.85*smooth(.72,.87,f))+.011*smooth(.91,.99,f))*(1-smooth(.80,.84,ending)),audio.currentTime,.3);
  if(hum)hum.frequency.setTargetAtTime(56+m*9-r*11-s*6+f*9,audio.currentTime,.3);
 }
+
+const desk=$('#desk'), deskButton=$('.desk-open'), note=$('.desk-note');
+const deskLines=['选好班次和房卡，可以在这里核对。','上行班次已抄送湖翼前台。','回程联和去程联上的时间相同。','门口灯亮着。钥匙已经交付。','回执副本留在房内。'];
+const memories=[
+ [$('#postmark'),2,'静泊旅馆明信片　·　湖岸西侧','静泊旅馆明信片　·　从房内寄出'],
+ [$('#arrival-directions'),3,$('#arrival-directions').textContent,'下缆车后，沿石阶到花箱下的双扇门。湖景客房在二楼。你进来的那扇绿门，原本在走廊尽头。']
+];
+let furthest=0, noticeTimer;
+function dismissNote(){clearTimeout(noticeTimer);note.classList.remove('show')}
+function updateFrontDesk(mapPos,ridePos,woods,passing,arrivalPos,hallPos,roomPos){
+ const tone=arrivalPos>.2?'carbon':woods>.12?'night':ridePos>.1?'mist':'paper';
+ if(document.body.dataset.tone!==tone)document.body.dataset.tone=tone;
+ const point=roomPos>.7?4:arrivalPos>.46?3:passing>.55?2:mapPos>.62?1:0;
+ if(point>furthest){
+  furthest=point;
+  write(note.querySelector('span'),deskLines[point]);
+  dismissNote();
+  if(point<4 && !desk.open){
+   note.classList.add('show');noticeTimer=setTimeout(dismissNote,3600);
+  }
+ }
+ document.body.classList.toggle('has-mail',furthest>0);
+ document.body.style.setProperty('--read',clamp(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)).toFixed(4));
+ for(const [el,threshold,normal,changed] of memories){
+  if(furthest<threshold || el.textContent===changed)continue;
+  const box=el.getBoundingClientRect();
+  if(box.bottom<0 || box.top>innerHeight)write(el,changed);
+ }
+ write($('#receipt-time'),$('.times [aria-pressed="true"]').textContent);
+ write($('#receipt-print'),printName);
+ write($('#receipt-where'),furthest>=3?'206 · 房内':furthest===2?'湖翼前台　／　副本':'湖翼前台');
+ write($('#receipt-message'),deskLines[furthest]);
+ desk.toggleAttribute('data-signed',furthest>=3);
+ landing.style.setProperty('--beam',(.82*smooth(.22,.86,hallPos)).toFixed(3));
+}
+deskButton.addEventListener('click',()=>{dismissNote();desk.showModal()});
+$('#desk-close').addEventListener('click',()=>desk.close());
+$('#desk-edit').addEventListener('click',()=>desk.close());
+desk.addEventListener('click',event=>{if(event.target===desk)desk.close()});
+const motionOK=matchMedia('(prefers-reduced-motion: no-preference)');
+stage.addEventListener('pointermove',event=>{
+ if(event.pointerType==='touch'||!motionOK.matches||!landing.hasAttribute('data-visible'))return;
+ const box=stage.getBoundingClientRect();
+ landing.style.setProperty('--beam-x',(100*clamp((event.clientX-box.left)/box.width))+'%');
+ landing.style.setProperty('--beam-y',(100*clamp((event.clientY-box.top)/box.height))+'%');
+},{passive:true});
+function startFresh(event){
+ event.preventDefault();dismissNote();furthest=0;
+ for(const [el,threshold,normal] of memories)write(el,normal);
+ const anchor=event.currentTarget.hash;
+ history.replaceState(null,'',anchor);
+ const target=anchor==='#top'?$('.logo'):$('.print-picks [aria-pressed="true"]');
+ const section=document.querySelector(anchor);
+ window.scrollTo({top:anchor==='#top'?0:section.getBoundingClientRect().top+scrollY-68,behavior:'instant'});
+ target.focus({preventScroll:true});redraw();
+}
+$('#back').addEventListener('click',startFresh);
+$('.replay-key').addEventListener('click',startFresh);
+
 let frame=0;function redraw(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;paint()})}
 addEventListener('scroll',redraw,{passive:true});addEventListener('resize',redraw);paint();
