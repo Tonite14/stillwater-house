@@ -106,3 +106,15 @@ body[data-print=ridge] {--key-ink:#873e2b;--key-art:repeating-linear-gradient(14
 .hall-credit{position:absolute;left:7vw;bottom:9svh;opacity:var(--hall-ink,0);text-shadow:0 1px 8px black}
 @media(max-width:680px){.arrival-guide{grid-template-columns:1fr;gap:18px}.arrival-guide img{height:auto}.shore-lodge{background-position:74% center}}
 @media(prefers-reduced-motion:reduce){.shore-lodge,.porch-close,.landing-view{transform:none}.journey.running{height:1750svh}}
+
+.impact-shot{position:absolute;inset:0;overflow:hidden;background:#080a09;opacity:0;pointer-events:none}
+.impact-shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--impact-focus,50% 50%)}
+.guestroom.strike .impact-shot{opacity:1}
+.guestroom.strike .impact-shot img{animation:break-through 510ms cubic-bezier(.16,.84,.25,1) both}
+[data-print=lake]{--impact-focus:55% 40%;--entry-y:2%;--entry-roll:-1.4deg}
+[data-print=pine]{--impact-focus:49% 52%;--entry-y:-5%;--entry-roll:0deg}
+[data-print=ridge]{--impact-focus:53% 43%;--entry-y:-1%;--entry-roll:3deg}
+@keyframes break-through{from{transform:scale(1.17) translateY(var(--entry-y)) rotate(var(--entry-roll));filter:brightness(.65)}to{transform:scale(1);filter:brightness(1)}}
+.guestroom.strike .night-credit{padding:.6rem 1rem .7rem;background:#0a0c0bd1;border-left:1px solid #c7ba97}
+.guestroom.strike .night-credit p{font-size:clamp(16px,1.6vw,24px)}
+@media(prefers-reduced-motion:reduce){.guestroom.strike .impact-shot img{animation:none}}
